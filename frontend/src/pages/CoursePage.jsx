@@ -4,8 +4,6 @@ import { Menu, X } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import TopicContent from "../components/TopicContent";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export default function CoursePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,20 +17,19 @@ export default function CoursePage() {
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/topics`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch topics");
-        }
-
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/topics`
+        );
         const data = await res.json();
+
         setTopics(data);
 
         const selected =
           data.find((t) => t.id === id) || data[0];
 
         setActiveTopic(selected);
-      } catch (error) {
-        console.error("Error loading topics:", error);
+      } catch (err) {
+        console.error("Failed to load topics", err);
       } finally {
         setLoading(false);
       }
@@ -61,7 +58,7 @@ export default function CoursePage() {
   }
 
   if (!activeTopic) {
-    return <p style={{ padding: "2rem" }}>No topic found.</p>;
+    return <p>No topics available</p>;
   }
 
   return (
