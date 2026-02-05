@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-/* MOCK DATA */
+router.get("/", (req, res) => {
+  res.json({ message: "API is working ✅" });
+});
+
+/* MOCK TOPICS DATA */
 const topics = [
   {
     id: "intro",
@@ -25,10 +29,6 @@ const topics = [
     content: "<h2>JSX</h2><p>JSX lets you write HTML in JS...</p>"
   }
 ];
-
-router.get("/", (req, res) => {
-  res.json({ message: "API is working" });
-});
 
 router.get("/topics", (req, res) => {
   res.json(topics);
