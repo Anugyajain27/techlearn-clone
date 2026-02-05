@@ -4,30 +4,7 @@ import { Menu, X } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import TopicContent from "../components/TopicContent";
 
-/* ---------- MOCK DATA ---------- */
-const MOCK_TOPICS = [
-  {
-    id: "intro",
-    title: "Introduction to React",
-    duration: "15 min",
-    completed: true,
-    content: "<h2>Welcome to React</h2><p>React is a UI library...</p>"
-  },
-  {
-    id: "components",
-    title: "Understanding Components",
-    duration: "20 min",
-    completed: true,
-    content: "<h2>Components</h2><p>Components are building blocks...</p>"
-  },
-  {
-    id: "jsx",
-    title: "JSX Syntax",
-    duration: "18 min",
-    completed: false,
-    content: "<h2>JSX</h2><p>JSX lets you write HTML in JS...</p>"
-  }
-];
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CoursePage() {
   const { id } = useParams();
@@ -40,13 +17,28 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setTopics(MOCK_TOPICS);
-      const selected =
-        MOCK_TOPICS.find(t => t.id === id) || MOCK_TOPICS[0];
-      setActiveTopic(selected);
-      setLoading(false);
-    }, 500);
+    const fetchTopics = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/topics`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch topics");
+        }
+
+        const data = await res.json();
+        setTopics(data);
+
+        const selected =
+          data.find((t) => t.id === id) || data[0];
+
+        setActiveTopic(selected);
+      } catch (error) {
+        console.error("Error loading topics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopics();
   }, [id]);
 
   const handleTopicSelect = (topic) => {
@@ -68,12 +60,16 @@ export default function CoursePage() {
     );
   }
 
+  if (!activeTopic) {
+    return <p style={{ padding: "2rem" }}>No topic found.</p>;
+  }
+
   return (
     <div className="app-layout">
       <div className={`sidebar-wrapper ${sidebarOpen ? "open" : "closed"}`}>
         <Sidebar
           topics={topics}
-          activeId={activeTopic?.id}
+          activeId={activeTopic.id}
           onSelect={handleTopicSelect}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
