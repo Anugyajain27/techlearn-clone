@@ -20,8 +20,12 @@ export default function CoursePage() {
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/topics`
         );
-        const data = await res.json();
 
+        if (!res.ok) {
+          throw new Error("API failed");
+        }
+
+        const data = await res.json();
         setTopics(data);
 
         const selected =
